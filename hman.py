@@ -7,9 +7,7 @@ if os.path.dirname(__file__) + "\\libs" not in sys.path:
 from PyQt4 import QtGui
 
 from main.MainUi import HmanMainUi
-
 from main.PathPicker import PathPicker
-
 from IO_path import readInitPath
 
 '''

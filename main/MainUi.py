@@ -1,4 +1,5 @@
 import os
+import webbrowser
 
 from PyQt4 import QtGui
 from PyQt4 import QtCore
@@ -156,8 +157,13 @@ class HmanMainUi(QtGui.QMainWindow):
         
         self.checkUpdate = QtGui.QAction("Check Updates", self)
         
+        self.showHelp = QtGui.QAction("Help", self)
+        self.showHelp.setIcon(QtGui.QIcon(self.parentPath + r"/icons/help.png"))
+        self.showHelp.triggered.connect(lambda: webbrowser.open("http://guillaumejobst.blogspot.fr/p/hman.html"))
+        
         self.aboutMenu.addAction(self.about)
-        self.aboutMenu.addAction(self.checkUpdate)
+        #self.aboutMenu.addAction(self.checkUpdate)
+        self.aboutMenu.addAction(self.showHelp)
         
         self.UI_PROPERTIES["clean_py"] = self.autoCleanTmpScript.isChecked()
         

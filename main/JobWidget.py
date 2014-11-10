@@ -729,7 +729,7 @@ class SoftPropertiesWidget(QtGui.QWidget):
         
     def updateCurrentJobBtnVisibility(self, enable=True):
         
-        self.renderCurrentJob.setEnabled(enable)
+        self.renderCurrentBtn.setEnabled(enable)
         
 class Colors():
     
