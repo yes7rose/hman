@@ -18,11 +18,17 @@ from IO_path import readInitPath
 '''
 
 def main(parent=None):
-     
+    
+    # Check if folder _pytmp exists
+    pymp = os.path.dirname(__file__) + "\\_pytmp"
+    if not os.path.exists(pymp):
+        os.mkdir(pymp)
+    
     outDic = readInitPath()
     pathResult = [outDic[k] for k in outDic.keys()]
     
     app = QtGui.QApplication(sys.argv)
+    
     # If no path found, launch ui
     if not any(pathResult):
         
