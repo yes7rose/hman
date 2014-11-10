@@ -10,6 +10,8 @@ Jobs can be: <br>
     - Python Jobs ( executes python file with given python interpreter )<br>
     - Batch job ( Execute batch commands on win platform )<br>
 <br>
+Simply run hman.py to launch the tool ( be sure you have python installed and in your PATH )<br>
+<br>
 Hman doesn't use software custom python directly ( hython or maya.cmds etc. ) but generates scripts and run them
 with proper interpreters. This means it can be used with all version of python 2.x, just be sure you have the 
 right version of PyQt4 in the libs directoy.<br>
