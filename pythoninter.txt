@@ -1,0 +1,3 @@
+# Python interpreter used when you create a new flowview from hman
+# DEFAULT will use the one set in $PATH (win)
+PYTHON=DEFAULT
