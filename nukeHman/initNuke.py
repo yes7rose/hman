@@ -7,6 +7,9 @@ from PyQt4 import QtCore
 
 from utils import LogW
 from utils.ErrorStr import ErrorStr
+
+DARK_STYLE = os.path.dirname(os.path.dirname(__file__)) + "\\dark.style"
+ICON_PATH = os.path.dirname(os.path.dirname(__file__)) + "\\icons"
         
 def loadNukeScript(nuke_script):
     '''
@@ -56,6 +59,11 @@ class PickNukeNode(QtGui.QDialog):
         
         self.output = output
         self.nodes = loadNukeScript(nuke_script)
+        with open(DARK_STYLE,"r") as style:
+            self.setStyleSheet(style.read())
+            
+        self.setWindowTitle("Pick a nuke write node")
+        self.setWindowIcon(QtGui.QIcon(ICON_PATH + "\\nuke.png"))
         
         self.SELECTED_NODE = None
         
@@ -78,8 +86,10 @@ class PickNukeNode(QtGui.QDialog):
         
         self.OK = QtGui.QPushButton("Ok")
         self.OK.clicked.connect(self.confirm)
+        self.OK.setObjectName("pushbutton")
         self.CANCEL = QtGui.QPushButton("Cancel")
         self.CANCEL.clicked.connect(self.cancel)
+        self.CANCEL.setObjectName("pushbutton")
         
         btnsLayout.addWidget(self.OK)
         btnsLayout.addWidget(self.CANCEL)

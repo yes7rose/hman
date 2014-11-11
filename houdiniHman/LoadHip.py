@@ -12,6 +12,8 @@ from utils.ErrorStr import ErrorStr
 import subprocess
 
 SCRIPT_PATH = os.path.dirname(os.path.dirname(__file__)) + "\\_pytmp"
+DARK_STYLE = os.path.dirname(os.path.dirname(__file__)) + "\\dark.style"
+ICON_PATH = os.path.dirname(os.path.dirname(__file__)) + "\\icons"
 
 def loadHip(hip_path, output, UI_PROPERTIES):
     '''
@@ -93,7 +95,12 @@ class PickHouNode(QtGui.QDialog):
     def __init__(self, hip_path, inTime, output, UI_PROPERTIES, parent=None):
         QtGui.QDialog.__init__(self, parent=parent)
         
+        with open(DARK_STYLE,"r") as style:
+            self.setStyleSheet(style.read())
+            
         self.setWindowTitle("Pick houdini render node")
+        self.setWindowIcon(QtGui.QIcon(ICON_PATH + "\\houdini.png"))
+        
         self.UI_PROPERTIES = UI_PROPERTIES
         self.OUT_NODE = None
         
@@ -128,6 +135,7 @@ class PickHouNode(QtGui.QDialog):
         self.OK = QtGui.QPushButton("Ok")
         self.OK.setFixedWidth(150)
         self.OK.clicked.connect(self.confirmNode)
+        self.OK.setObjectName("pushbutton")
         
         btnLayout.addWidget(self.OK)
         
@@ -165,6 +173,7 @@ class PickHouNode(QtGui.QDialog):
             self.CANCEL.setFixedWidth(150)
             self.CANCEL.clicked.connect(self.cancelNode)
             btnLayout.addWidget(self.CANCEL)
+            self.CANCEL.setObjectName("pushbutton")
         
         self.mainLayout.addItem(btnLayout)
         
