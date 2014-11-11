@@ -17,6 +17,8 @@ $RECYCLE.BIN/
 # Python compiled
 *.pyc
 
+#Hman log
+hman_log.log
 # =========================
 # Operating System Files
 # =========================
