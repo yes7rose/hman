@@ -8,9 +8,8 @@ from IO_path import readInitPath
 
 from PyQt4 import QtGui
 
+
 SCRIPT_PATH = os.path.dirname(os.path.dirname(__file__)) + "\\_pytmp"
-ICON_PATH = os.path.dirname(os.path.dirname(__file__)) + "\\icons"
-DARK_STYLE = os.path.dirname(os.path.dirname(__file__)) + "\\dark.style"
 
 def loadMayaFile(file_path, mode, UI_PROPERTIES):
     
@@ -161,14 +160,8 @@ class PickMayaNode(QtGui.QDialog):
     def __init__(self, file_path, inTime, output, mode, UI_PROPERTIES, parent=None):
         QtGui.QDialog.__init__(self, parent=parent)
         
-        self.setWindowIcon(QtGui.QIcon(ICON_PATH + "\\maya.png"))
-        with open(DARK_STYLE,"r") as style:
-            self.setStyleSheet(style.read())
-        
         self.output = output
         self.datas = loadMayaFile(file_path, mode, UI_PROPERTIES)
-        
-        self.setWindowTitle("Pick maya " + str(mode).replace("_"," "))
         
         if mode == "render_layer":
             self.nodes = self.datas["render_layer"]
@@ -199,11 +192,9 @@ class PickMayaNode(QtGui.QDialog):
         btnsLayout.setSpacing(10)
         
         self.OK = QtGui.QPushButton("Ok")
-        self.OK.setObjectName("pushbutton")
         self.OK.clicked.connect(self.confirm)
         self.CANCEL = QtGui.QPushButton("Cancel")
         self.CANCEL.clicked.connect(self.cancel)
-        self.CANCEL.setObjectName("pushbutton")
         
         btnsLayout.addWidget(self.OK)
         if self.nodes:

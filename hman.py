@@ -11,8 +11,10 @@ from main.PathPicker import PathPicker
 from IO_path import readInitPath
 
 '''
-    Run this script to run hman.
-    Open the UI to setup path if needed.
+    Init the path.inf.
+    Read the path.inf, if no path are set
+    open the UI to setup path.
+    Path must be valid install path.
 '''
 
 def main(parent=None):

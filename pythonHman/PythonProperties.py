@@ -35,8 +35,6 @@ class PytonProperties(SoftPropertiesWidget):
         self.interpreterPath = QtGui.QLineEdit(self.jobWidget.properties["interpreter"])
         self.interpreterPath.returnPressed.connect(lambda: self.updateInterpreterFile(str(self.interpreterPath.text())))
         self.pickInterpreterBtn = QtGui.QPushButton("Pick")
-        self.pickInterpreterBtn.setObjectName("pushbutton")
-        self.pickInterpreterBtn.setFixedWidth(75)
         self.pickInterpreterBtn.clicked.connect(self.pickInterpreter)
         
         interpreterLayout.addWidget(self.interpreterLabel)
