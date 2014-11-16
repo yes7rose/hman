@@ -9,6 +9,7 @@ from PyQt4 import QtGui
 from main.MainUi import HmanMainUi
 from main.PathPicker import PathPicker
 from IO_path import readInitPath
+from utils import LogW
 
 '''
     Init the path.inf.
@@ -24,6 +25,14 @@ def main(parent=None):
     if not os.path.exists(pymp):
         os.mkdir(pymp)
     
+    # Check hman version
+    version = "version"
+    with open(version, "r") as v:
+        version = v.readline()
+        msg = "INFO: "
+        msg += "Launching hman version: " + version
+        LogW.writeLog(None, msg, printout=True)
+    
     outDic = readInitPath()
     pathResult = [outDic[k] for k in outDic.keys()]
     
@@ -32,13 +41,13 @@ def main(parent=None):
     # If no path found, launch ui
     if not any(pathResult):
         
-        pathPicker = PathPicker(parent)
+        pathPicker = PathPicker(version, parent)
         pathPicker.exec_()
         
         if pathPicker.CANCEL:
             return
         
-    ui = HmanMainUi(parent)
+    ui = HmanMainUi(version, parent)
     ui.show()
         
     app.exec_()

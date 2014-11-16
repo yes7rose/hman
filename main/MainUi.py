@@ -28,11 +28,14 @@ DARK_STYLE = os.path.dirname(os.path.dirname(__file__)) + "\\dark.style"
 
 class HmanMainUi(QtGui.QMainWindow):
     
-    def __init__(self, parent=None):
+    def __init__(self, version, parent=None):
         QtGui.QMainWindow.__init__(self, parent=parent)
         
         with open(DARK_STYLE,"r") as style:
             self.setStyleSheet(style.read())
+            
+        #Main attrib
+        self.setWindowTitle("hman v" + version)
         
         self.parentPath = os.path.dirname(__file__)
         self.parentPath = os.path.dirname(self.parentPath)
@@ -60,7 +63,6 @@ class HmanMainUi(QtGui.QMainWindow):
         self._initToolBarButtons()
         self._initMenus()
         self.statusBar().showMessage('Ready')
-        
         
         self.tabifyDockWidget(self.outputDock, self.graphDataDock)
         
@@ -179,9 +181,6 @@ class HmanMainUi(QtGui.QMainWindow):
             self.addNukeJob.setEnabled(False)
             
     def _initToolBar(self):
-        
-        #Main attrib
-        self.setWindowTitle("hman")
         
         # Software found
         self.software =  readInitPath()

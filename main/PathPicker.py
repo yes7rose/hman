@@ -11,10 +11,10 @@ class PathPicker(QtGui.QDialog):
         UI used to setup path for software.  
     '''
      
-    def __init__(self, parent=None):
+    def __init__(self, version, parent=None):
         QtGui.QMainWindow.__init__(self, parent=parent)
         
-        self.setWindowTitle("Hman path picker") 
+        self.setWindowTitle("Hman path picker v" + version) 
         style = os.path.dirname(__file__) + "\\dark.style"
         style = style.replace("\\main","")
         
