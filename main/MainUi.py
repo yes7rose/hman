@@ -31,6 +31,8 @@ class HmanMainUi(QtGui.QMainWindow):
     def __init__(self, version, parent=None):
         QtGui.QMainWindow.__init__(self, parent=parent)
         
+        self.version = version
+        
         with open(DARK_STYLE,"r") as style:
             self.setStyleSheet(style.read())
             
@@ -524,6 +526,6 @@ class HmanMainUi(QtGui.QMainWindow):
             
     def updatePath(self):
         
-        picker = PathPicker()
+        picker = PathPicker(self.version)
         picker.linkToMainUi(self)
         picker.exec_()
