@@ -16,7 +16,8 @@ class OutputDock(QtGui.QDockWidget):
         dockLay.setSpacing(10)
         dockWidget = QtGui.QWidget()
         
-        self.output = QtGui.QTextEdit()
+        self.output = QtGui.QTextBrowser()
+        self.output.setOpenExternalLinks(True)
         self.output.setReadOnly(True)
         dockLay.addWidget(self.output)
         

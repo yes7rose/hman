@@ -16,6 +16,8 @@ from JobWidget import NukeJobWidget
 from JobWidget import BatchJobWidget
 from JobWidget import PythonJobWidget
 
+from utils import CheckVersion
+
 from PropertiesDock import PropertyDock
 from OutputDock import OutputDock
 from GraphdataDock import GraphdataDock
@@ -157,16 +159,18 @@ class HmanMainUi(QtGui.QMainWindow):
         self.aboutMenu = self.menu.addMenu("About")
         
         self.about = QtGui.QAction("About hman", self)
+        self.about.triggered.connect(lambda: CheckVersion.about(self.version))
         self.about.setIcon(QtGui.QIcon(self.parentPath + r"/icons/hman_small.png"))
         
         self.checkUpdate = QtGui.QAction("Check Updates", self)
+        self.checkUpdate.triggered.connect(lambda: CheckVersion.checkVersion(self.version, self.outputDock.output))
         
         self.showHelp = QtGui.QAction("Help", self)
         self.showHelp.setIcon(QtGui.QIcon(self.parentPath + r"/icons/help.png"))
         self.showHelp.triggered.connect(lambda: webbrowser.open("http://guillaumejobst.blogspot.fr/p/hman.html"))
         
         self.aboutMenu.addAction(self.about)
-        #self.aboutMenu.addAction(self.checkUpdate)
+        self.aboutMenu.addAction(self.checkUpdate)
         self.aboutMenu.addAction(self.showHelp)
         
         self.UI_PROPERTIES["clean_py"] = self.autoCleanTmpScript.isChecked()
@@ -249,6 +253,7 @@ class HmanMainUi(QtGui.QMainWindow):
         self.aboutBtn = QtGui.QAction("About", self)
         self.aboutBtn.setIcon(QtGui.QIcon(self.parentPath + r"/icons/hman_large.png"))
         self.aboutBtn.setStatusTip("About")
+        self.aboutBtn.triggered.connect(lambda: CheckVersion.about(self.version))
         
         # Quit button
         self.quitBtn = QtGui.QAction("Quit hman", self)

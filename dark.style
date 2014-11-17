@@ -10,6 +10,11 @@ QLabel:disabled{
 	color:#5a5a5a;
 }
 
+QStatusBar{
+	color:#cccccc;
+}
+
+
 QTextEdit{
 	background-color: #1d1d1d;
 	color: white;
