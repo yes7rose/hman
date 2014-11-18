@@ -125,26 +125,54 @@ class FlowView(QtGui.QWidget):
             if newJobsList[i].jobType == JobTypes.MAYA:
                 w = MayaJobWidget(self.propertyDock, i, self, self.outputDock.output, self.UI_PROPERTIES, parent=self)
                 w.properties = newJobsList[i].properties
+                
+                if newJobsList[i].properties["file_path"]:
+                    w.pathLabel.setText("Path: " + newJobsList[i].properties["file_path"])
+                if newJobsList[i].properties["isbypassed"]:
+                    w.isBypassed = False
+                    w.bypassWidget()
+                    
                 w.updateWarning()
                 
             elif newJobsList[i].jobType == JobTypes.NUKE:
                 w = NukeJobWidget(self.propertyDock, i, self, self.outputDock.output, self.UI_PROPERTIES, parent=self)
                 w.properties = newJobsList[i].properties
+                if newJobsList[i].properties["file_path"]:
+                    w.pathLabel.setText("Path: " + newJobsList[i].properties["file_path"])
+                if newJobsList[i].properties["isbypassed"]:
+                    w.isBypassed = False
+                    w.bypassWidget()
+                    
                 w.updateWarning()
                 
             elif newJobsList[i].jobType == JobTypes.HOUDINI:
                 w = HoudiniJobWidget( self.propertyDock, i, self, self.outputDock.output, self.UI_PROPERTIES, parent=self)
                 w.properties = newJobsList[i].properties
+                if newJobsList[i].properties["file_path"]:
+                    w.pathLabel.setText("Path: " + newJobsList[i].properties["file_path"])
+                if newJobsList[i].properties["isbypassed"]:
+                    w.isBypassed = False
+                    w.bypassWidget()
                 w.updateWarning()
                 
             elif newJobsList[i].jobType == JobTypes.PYTHON:
                 w = PythonJobWidget( self.propertyDock, i, self, self.outputDock.output, parent=self)
                 w.properties = newJobsList[i].properties
+                if newJobsList[i].properties["file_path"]:
+                    w.pathLabel.setText("Path: " + newJobsList[i].properties["file_path"])
+                if newJobsList[i].properties["isbypassed"]:
+                    w.isBypassed = False
+                    w.bypassWidget()
                 w.updateWarning()
                 
             elif newJobsList[i].jobType == JobTypes.BATCH:
                 w = BatchJobWidget( self.propertyDock, i, self, self.outputDock.output, parent=self) 
                 w.properties = newJobsList[i].properties
+                if newJobsList[i].properties["file_path"]:
+                    w.pathLabel.setText("Path: " + newJobsList[i].properties["file_path"])
+                if newJobsList[i].properties["isbypassed"]:
+                    w.isBypassed = False
+                    w.bypassWidget()
                 w.updateWarning()
                 
             self.flowLayout.addWidget(w)   

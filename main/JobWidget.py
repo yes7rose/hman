@@ -66,7 +66,8 @@ class JobWidget(QtGui.QWidget):
                            "description":"",
                            "output_path":"",
                            "override_frames":False,
-                           "override_output_path":False}
+                           "override_output_path":False,
+                           "isbypassed":False}
         
         self.setToolTip(jobToolTips(self.jobType, self.ID, self.properties["file_path"], self.properties["description"]))
         
@@ -145,7 +146,7 @@ class JobWidget(QtGui.QWidget):
         upDownLayout.addWidget(self.downBtn)
         
         # Icon 
-        self.iconLabel = QtGui.QLabel("aaa")
+        self.iconLabel = QtGui.QLabel("")
         self.iconLabel.setFixedWidth(32)
         self.iconLabel.setFixedHeight(32)
         
@@ -234,6 +235,7 @@ class JobWidget(QtGui.QWidget):
     def bypassWidget(self):
         
         if self.isBypassed:
+            self.properties["isbypassed"] = False
             self.isBypassed = False
             self.BG_COLOR = self.DEFAULT_BG_COLOR
             self.repaint()
@@ -244,6 +246,7 @@ class JobWidget(QtGui.QWidget):
             self.bypass.setToolTip("Disable this node")
             
         else:
+            self.properties["isbypassed"] = True
             self.isBypassed = True
             self.BG_COLOR = Colors.BYPASS_BG
             self.repaint()
