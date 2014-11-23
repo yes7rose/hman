@@ -28,6 +28,7 @@ class FlowView(QtGui.QWidget):
         QtGui.QWidget.__init__(self, parent=parent)
         
         self.setObjectName("flowview")
+        self.graphDataValue = []
         
         self.mainUI = parent
         self.UI_PROPERTIES = UI_PROPERTIES
@@ -40,6 +41,7 @@ class FlowView(QtGui.QWidget):
         self.jobs = []
         self.propertyDock = None
         self.outputDock = None
+        self.graphDataDock = None
         
         self.setMinimumWidth(375)
         
@@ -53,6 +55,7 @@ class FlowView(QtGui.QWidget):
         self.workerThread.resetProgressBar.connect(self._ui_resetProgressBar)
         self.workerThread.progressBarToActivity.connect(self._ui_progressBarToActivityMonitor)
         self.workerThread.startJob.connect(self._ui_disableButton)
+        self.workerThread.graphDataRefresh.connect(self.refreshGraphData)
         
         self.currentWorkerThread.updateProgressBar.connect(self._ui_updateProgressBar)
         self.currentWorkerThread.updateMessage.connect(self._ui_setInfoMessage)
@@ -71,6 +74,12 @@ class FlowView(QtGui.QWidget):
             Link the flowview to the output dock widget.
         '''
         self.outputDock = outputDock
+        
+    def linkToGraphdataDock(self, graphDataDock):
+        '''
+            Link the flowview to the graphdata dock widget.
+        '''
+        self.graphDataDock = graphDataDock
     
     def addJob(self, job):
         '''
@@ -303,6 +312,10 @@ class FlowView(QtGui.QWidget):
             if p == QtGui.QMessageBox.Cancel:
                 return
         
+        # Enable / Disable graph data
+        if self.graphDataDock.MATPLOTLIB_IMPORTED:
+            self.workerThread.enableGraphData = self.graphDataDock.enableGraphDataCheck.isChecked()
+        
         self.timerThread.startTime = 0
         self.workerThread.jobList = tmpJobs
         self.workerThread.start()
@@ -454,6 +467,11 @@ class FlowView(QtGui.QWidget):
         else:
             self.timerThread.start()
             self.mainUI.cancelFlow.setEnabled(True)
+            
+    def refreshGraphData(self, datas):
+
+        if self.graphDataDock:
+            self.graphDataDock.refreshGraphData(datas)
 
 #################################################
 

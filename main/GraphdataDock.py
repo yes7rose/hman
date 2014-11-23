@@ -1,21 +1,21 @@
 import os
-
+import pickle
 from PyQt4 import QtGui
 from PyQt4 import QtCore
-
-from graphData import GraphData
 
 MATPLOTLIB_IMPORTED = False
 
 try:
     from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
     import matplotlib.pyplot as plt
+    import matplotlib.image as mpimg
     MATPLOTLIB_IMPORTED = True
     
 except ImportError:
     pass
     
 ICONPATH = os.path.dirname(os.path.dirname(__file__))
+TMP_GRAPHDATA = os.path.dirname(os.path.dirname(__file__)) + "\\_pytmp\\graphdata.tmp"
 
 class GraphdataDock(QtGui.QDockWidget):
     
@@ -34,6 +34,8 @@ class GraphdataDock(QtGui.QDockWidget):
         self.graphDataLayout.setAlignment(QtCore.Qt.AlignTop)
         self.graphDataLayout.setSpacing(10)
         
+        self.MATPLOTLIB_IMPORTED = MATPLOTLIB_IMPORTED
+        
         # Check if matplotlib is found
         if MATPLOTLIB_IMPORTED:
         
@@ -42,12 +44,12 @@ class GraphdataDock(QtGui.QDockWidget):
             
             self.enableGraphDataCheck = QtGui.QCheckBox("Enable Graph Data")
             self.enableGraphDataCheck.setChecked(False)
-            self.enableGraphDataCheck.clicked.connect(self.enableGraphData)
+            self.enableGraphDataCheck.clicked.connect(lambda: self.enableGraphData(False,False))
             self.optionsLayout.addWidget(self.enableGraphDataCheck)
             
-            self.refreshGraph = QtGui.QPushButton("Refresh Datas")
+            self.refreshGraph = QtGui.QPushButton("Refresh Graph")
             self.refreshGraph.setObjectName("pushbutton")
-            self.refreshGraph.clicked.connect(self.refreshGraphData)
+            self.refreshGraph.clicked.connect(lambda: self.refreshGraphData(external=True))
             self.optionsLayout.addWidget(self.refreshGraph)
             
             self.graphDataLayout.addItem(self.optionsLayout)
@@ -83,9 +85,10 @@ class GraphdataDock(QtGui.QDockWidget):
             
             self.saveBtn = QtGui.QPushButton("")
             self.saveBtn.setFlat(True)
-            self.saveBtn.setFixedSize(QtCore.QSize(32,32))
+            self.saveBtn.setFixedSize(QtCore.QSize(40,40))
             self.saveBtn.setIcon(QtGui.QIcon(ICONPATH + "\\icons\\save.png"))
             self.saveBtn.setIconSize(QtCore.QSize(32,32))
+            self.saveBtn.clicked.connect(self.saveGraphToPng)
             self.bottomLayout.addWidget(self.saveBtn)
             
             self.graphDataLayout.addItem(self.bottomLayout)
@@ -119,9 +122,13 @@ class GraphdataDock(QtGui.QDockWidget):
         if MATPLOTLIB_IMPORTED:
             self.enableGraphData()
         
-    def enableGraphData(self):
+    def enableGraphData(self, override=False, overrideValue=False):
         
-        toggle = self.enableGraphDataCheck.isChecked()
+        if override:
+            toggle = overrideValue
+        else:
+            toggle = self.enableGraphDataCheck.isChecked()
+            
         self.figureWidget.setVisible(toggle)
         self.maxTimeLabel.setVisible(toggle)
         self.minTimeLabel.setVisible(toggle)
@@ -130,29 +137,53 @@ class GraphdataDock(QtGui.QDockWidget):
         
         if toggle:
             self.refreshGraphData()
+            
+        else:
+            self.setMinimumHeight(10)
         
-    def refreshGraphData(self):
+    def refreshGraphData(self, datas=None, external=False):
         
-        datas = [[0,1,2,3,4], [2.5,2.5,3.0,1.0,4.85]]
+        if external:
+            if os.path.exists(TMP_GRAPHDATA):
+                datas = None
+                with open(TMP_GRAPHDATA, 'rb') as handle:
+                    datas = pickle.load(handle)
+                    
+            else:
+                datas = [[0,1,2], [0,0,0]]
         
-        graph = self.figure.add_subplot(111)
-        graph.hold(False)
-        plt.subplots_adjust(top= 0.9, bottom = 0.15)
         
-        graph.plot(datas[0], datas[1], 'o-')
-        graph.axis([0, len(datas[0]), 0, int(max(datas[1])+(max(datas[1])*0.1))+1])
-        graph.set_xlabel("Job number")
-        graph.set_ylabel("Rendering time (seconds)")
-
-        self.canvas.draw()
+        if datas:
+            
+            self.graph = self.figure.add_subplot(111)
+            self.graph.hold(False)
+            plt.subplots_adjust(top= 0.9, bottom = 0.15)
+            
+            self.graph.plot(datas[0], datas[1], 'o-')
+            self.graph.axis([0, int(max(datas[0])), 0, int(max(datas[1])+(max(datas[1])*0.1))+1])
+            self.graph.set_xticks(datas[0])
+            self.graph.set_xlabel("Job number")
+            self.graph.set_ylabel("Rendering time (seconds)")
+    
+            self.canvas.draw()
+            
+            # Min / Max labels update
+            maxTime = max(datas[1])
+            maxIndex = datas[1].index(maxTime)
+            self.maxTimeLabel.setText("Max rendering time: {0:.2f} seconds, job number: {1}".format(maxTime, maxIndex))
+            
+            minTime = min(datas[1])
+            minIndex = datas[1].index(minTime)
+            self.minTimeLabel.setText("Min rendering time: {0:.2f} seconds, job number: {1}".format(minTime, minIndex))
+            
+            # Resize UI
+            self.setMinimumHeight(415)
+            
+    def saveGraphToPng(self):
         
-        # Min / Max labels update
-        maxTime = max(datas[1])
-        maxIndex = datas[1].index(maxTime)
-        self.maxTimeLabel.setText("Max rendering time: {0} seconds, job number: {1}".format(maxTime, maxIndex))
-        
-        minTime = min(datas[1])
-        minIndex = datas[1].index(minTime)
-        self.minTimeLabel.setText("Min rendering time: {0} seconds, job number: {1}".format(minTime, minIndex))
-        
+        p = QtGui.QFileDialog.getSaveFileName(parent=None, filter = ".png image files (*.png)")
+        print p
+        if not p:
+            return
+        self.figure.savefig(str(p))
         

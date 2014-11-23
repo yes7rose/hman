@@ -350,6 +350,10 @@ class HmanMainUi(QtGui.QMainWindow):
         self.graphDataDock = GraphdataDock(self)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.graphDataDock)
         
+        # Bind graphdata to flowview
+        if self.graphDataDock.MATPLOTLIB_IMPORTED:
+            self.flowView.linkToGraphdataDock(self.graphDataDock)
+        
     def _initProgressbar(self):
         
         progressInfoLay = QtGui.QHBoxLayout()

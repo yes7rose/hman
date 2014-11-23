@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 import time
+import os
 import datetime
+import pickle
 
 from PyQt4 import QtCore
 
@@ -8,6 +10,8 @@ from utils.ErrorStr import ErrorStr
 from .JobWidget import JobTypes
 
 import threading
+
+TMP_GRAPHDATA = os.path.dirname(os.path.dirname(__file__)) + "\\_pytmp\\graphdata.tmp"
 
 class JobWorkerThread(QtCore.QThread):
     '''
@@ -19,12 +23,19 @@ class JobWorkerThread(QtCore.QThread):
     progressBarToActivity = QtCore.pyqtSignal(bool)
     updateMessage = QtCore.pyqtSignal(str, bool)
     startJob = QtCore.pyqtSignal(bool)
+    graphDataRefresh = QtCore.pyqtSignal(list)
     
     def __init__(self):
         QtCore.QThread.__init__(self)
         self.jobList = []
+        self.enableGraphData = False
     
     def run(self):
+        
+        self.graphDataValues = [[],[]]
+        # delete tmp graphdata if any
+        if os.path.exists(TMP_GRAPHDATA):
+            os.remove(TMP_GRAPHDATA)
         
         self.resetProgressBar.emit()
         self.startJob.emit(False)
@@ -70,6 +81,7 @@ class JobWorkerThread(QtCore.QThread):
                 i._renderCurrent()
             
             jobEndTime = time.time() - jobStartTime
+            jobEndTimeSec = jobEndTime
             jobEndTime = datetime.timedelta(seconds=int(jobEndTime))
             
             if i.ERROR:
@@ -80,7 +92,16 @@ class JobWorkerThread(QtCore.QThread):
             
             self.updateProgressBar.emit(step)
             
+            self.graphDataValues[0].append(k)
+            self.graphDataValues[1].append(jobEndTimeSec)
             k += 1
+            
+        if self.enableGraphData:
+            self.graphDataRefresh.emit(self.graphDataValues)
+        
+        # Save graphdata to tmp folder   
+        with open(TMP_GRAPHDATA, "wb") as f:
+            pickle.dump(self.graphDataValues, f)
 
         globalEndTime = time.time() - globalStartTime
         globalEndTime = datetime.timedelta(seconds=int(globalEndTime))
