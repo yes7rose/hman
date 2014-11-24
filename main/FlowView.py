@@ -408,28 +408,23 @@ class FlowView(QtGui.QWidget):
                     
                     if data["jobtype"] == JobTypes.MAYA:
                         w = MayaJobWidget(self.propertyDock, data["ID"] + (len(self.jobs)-data["ID"]), self, self.outputDock.output, self.UI_PROPERTIES, parent=self)
-                        w.properties = data["properties"]
-                        self.addJob(w)
                         
                     elif data["jobtype"] == JobTypes.NUKE:
                         w = NukeJobWidget(self.propertyDock, data["ID"] + (len(self.jobs)-data["ID"]), self, self.outputDock.output, self.UI_PROPERTIES, parent=self)
-                        w.properties = data["properties"]
-                        self.addJob(w)
                         
                     elif data["jobtype"] == JobTypes.HOUDINI:
                         w = HoudiniJobWidget( self.propertyDock, data["ID"] + (len(self.jobs)-data["ID"]), self, self.outputDock.output, self.UI_PROPERTIES, parent=self)
-                        w.properties = data["properties"]
-                        self.addJob(w)
                         
                     elif data["jobtype"] == JobTypes.PYTHON:
                         w = PythonJobWidget( self.propertyDock, data["ID"] + (len(self.jobs)-data["ID"]), self, self.outputDock.output, parent=self)
-                        w.properties = data["properties"]
-                        self.addJob(w)
                         
                     elif data["jobtype"] == JobTypes.BATCH:
                         w = BatchJobWidget( self.propertyDock, data["ID"] + (len(self.jobs)-data["ID"]), self, self.outputDock.output, parent=self)
-                        w.properties = data["properties"]
-                        self.addJob(w)
+                        
+                    w.properties = data["properties"]
+                    if data["properties"]["file_path"]:
+                        w.pathLabel.setText("Path: " + data["properties"]["file_path"])
+                    self.addJob(w)
                 
                  
                 LogW.writeLog(self.outputDock.output, ErrorStr.ErrorStr.INFO + " {0} loaded successfully.".format(str(f)))  
@@ -455,8 +450,8 @@ class FlowView(QtGui.QWidget):
     def _ui_progressBarToActivityMonitor(self, enable=True):
         self.mainUI._ui_enableActivityMonitor(enable)
             
-    def _ui_setInfoMessage(self, msg, toOutput=False):
-        self.mainUI._ui_setInfoMessage(msg, toOutput)
+    def _ui_setInfoMessage(self, msg, toOutput=False, lastJob=False):
+        self.mainUI._ui_setInfoMessage(msg, toOutput, lastJob)
         
     def _ui_disableButton(self, enable=False):
         self.mainUI._ui_disableButton(enable)

@@ -426,7 +426,7 @@ class HmanMainUi(QtGui.QMainWindow):
             self._ui_resetProgressBar()
             self.cancelFlow.setEnabled(False)
             
-    def _ui_setInfoMessage(self, msg, toOutput=False):
+    def _ui_setInfoMessage(self, msg, toOutput=False, lastJob=False):
         
         if toOutput:
             utils.LogW.writeLog(self.outputDock.output, msg)
@@ -436,6 +436,9 @@ class HmanMainUi(QtGui.QMainWindow):
             msg = msg.split("<b>")[1]
             
         self.progressInfo.setText(str(msg))
+        
+        if lastJob:
+            self.progressBar.setValue(100)
         
     def _ui_disableButton(self, enable=False):
         
