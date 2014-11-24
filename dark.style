@@ -14,6 +14,12 @@ QStatusBar{
 	color:#cccccc;
 }
 
+ QToolTip {
+     border: 1px solid black;
+     color: black;
+     opacity: 200;
+     background: #898989;
+ }
 
 QTextEdit{
 	background-color: #1d1d1d;
