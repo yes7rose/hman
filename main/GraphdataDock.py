@@ -8,7 +8,6 @@ MATPLOTLIB_IMPORTED = False
 try:
     from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
     import matplotlib.pyplot as plt
-    import matplotlib.image as mpimg
     MATPLOTLIB_IMPORTED = True
     
 except ImportError:
