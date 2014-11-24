@@ -313,8 +313,9 @@ class FlowView(QtGui.QWidget):
                 return
         
         # Enable / Disable graph data
-        if self.graphDataDock.MATPLOTLIB_IMPORTED:
-            self.workerThread.enableGraphData = self.graphDataDock.enableGraphDataCheck.isChecked()
+        if self.graphDataDock:
+            if self.graphDataDock.MATPLOTLIB_IMPORTED:
+                self.workerThread.enableGraphData = self.graphDataDock.enableGraphDataCheck.isChecked()
         
         self.timerThread.startTime = 0
         self.workerThread.jobList = tmpJobs
