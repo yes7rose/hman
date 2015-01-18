@@ -181,7 +181,7 @@ border-radius: 3px;
   background:green;
  }
 
-/* MENU */
+/* MENU BAR */
 QMenuBar {
      background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                        stop:0 #252525, stop:1 #202020);
@@ -193,7 +193,7 @@ QMenuBar::item {
                                        stop:0 #252525, stop:1 #202020);
 
 }
- 
+
 QMenuBar::item:selected {
 	background-color: #111111;
 }
