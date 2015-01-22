@@ -36,7 +36,16 @@ def main(parent=None):
     outDic = readInitPath()
     pathResult = [outDic[k] for k in outDic.keys()]
     
+    # Taskbar icon fix for windows 7
+    try:
+        import ctypes
+        myappid = u'hman'
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    except ImportError:
+        pass
+    
     app = QtGui.QApplication(sys.argv)
+    app.setWindowIcon(QtGui.QIcon(os.path.dirname(__file__)+"\\icons\\hman_small.png"))
     
     # If no path found, launch ui
     if not any(pathResult):
