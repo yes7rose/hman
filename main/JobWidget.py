@@ -18,6 +18,8 @@ from nukeHman.CreateNukeRenderScript import deleteNukeRenderScript
 from mayaHman.LoadMayaFile import exportObjScript
 from mayaHman.LoadMayaFile import cleanTmpMayaFile
 
+import utils.ErrorStr as ErrorStr
+
 
 iconsPath = os.path.dirname(os.path.dirname(__file__)) + "\\icons\\"
 SCRIPT_PATH = os.path.dirname(os.path.dirname(__file__)) + "\\_pytmp"
@@ -41,6 +43,7 @@ class JobWidget(QtGui.QWidget):
         self.ERROR = ""
         self.OUT = ""
         self.WARNING = True
+        self.IS_RENDERING = False
         
         # Common job properties
         self.HEIGHT = 120
@@ -436,12 +439,23 @@ class MayaJobWidget(JobWidget):
         
     def _renderCurrent(self):
         
+        mayapath = readInitPath()["MAYA_PATH"]
+        
+        if mayapath:
+            if not os.path.exists(mayapath):
+                print("Maya path not correct, job {0} skipped.".format(self.ID))
+                self.ERROR = "MAYA_PATH ERROR"
+                return False
+        else:
+            print("Maya path not correct, job {0} skipped.".format(self.ID))
+            self.ERROR = "MAYA_PATH ERROR"
+            return False
+        
         # Render a scene
         if self.properties["job_type"] == "Render Scene":
             
-            MAYA_RENDER = '"'+ readInitPath()["MAYA_PATH"] + "\\bin\\render.exe" + '" '
+            MAYA_RENDER = '"'+ mayapath + "\\bin\\render.exe" + '" '
             
-            allFlags = [MAYA_RENDER]
             
             if self.properties["override_frames"]:
                 MAYA_RENDER += "-s " + str(float(self.properties["start_frame"]))
@@ -474,7 +488,7 @@ class MayaJobWidget(JobWidget):
                             self.properties["obj_outputpath"],
                             self.properties["file_path"])
             
-            MAYAPY = '"' + readInitPath()["MAYA_PATH"] + "\\bin\\mayapy.exe" + '"'
+            MAYAPY = '"' + mayapath + "\\bin\\mayapy.exe" + '"'
             
             with open(SCRIPT_PATH + "\\mayaExportObjTmp.bat", 'w') as bat:
                 bat.write(MAYAPY + ' "' + SCRIPT_PATH + "\\exportObjTmp.py" +'"')
@@ -539,11 +553,22 @@ class HoudiniJobWidget(JobWidget):
         '''
         
         session_key = random.randint(1,100)
-        
+        hythonPath = readInitPath()["HOUDINI_PATH"]
+
+        if hythonPath:
+            hythonPath = hythonPath + "\\bin\\hython.exe"
+            
+            if not os.path.exists(hythonPath):
+                print("Houdini path not correct, job {0} skipped.".format(self.ID))
+                self.ERROR = "HOUDINI_PATH ERROR"
+                return False
+        else:
+            print("Houdini path not correct, job {0} skipped.".format(self.ID))
+            self.ERROR = "HOUDINI_PATH ERROR"
+            return False
         createHoudiniRenderScript(self.ID, session_key, self.properties)
         
         scriptPath = SCRIPT_PATH + "\\renderHoudiniScript_s{0}_id{1}.py".format(session_key, self.ID)
-        hythonPath = readInitPath()["HOUDINI_PATH"] + "\\bin\\hython.exe"
         
         p = subprocess.Popen([hythonPath, scriptPath])
         p.wait()
@@ -598,8 +623,19 @@ class NukeJobWidget(JobWidget):
         session_key = random.randint(1,100)
         createNukeRenderScript(self.ID, session_key, self.properties)
         
+        if readInitPath()["NUKE_PATH"]:
+            nukePythonPath = readInitPath()["NUKE_PATH"] + "\\python.exe"
+            
+            if not os.path.exists(nukePythonPath):
+                print("Nuke path not correct, job {0} skipped.".format(self.ID))
+                self.ERROR = "NUKE_PATH ERROR"
+                return False
+        else:
+            print("Nuke path not correct, job {0} skipped.".format(self.ID))
+            self.ERROR = "NUKE_PATH ERROR"
+            return False
+        
         scriptPath = SCRIPT_PATH + "\\renderNukeScript_s{0}_id{1}.py".format(session_key, self.ID)
-        nukePythonPath = readInitPath()["NUKE_PATH"] + "\\python.exe"
 
         p = subprocess.Popen([nukePythonPath, scriptPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         p.wait()

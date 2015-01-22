@@ -105,7 +105,13 @@ class JobWorkerThread(QtCore.QThread):
 
         globalEndTime = time.time() - globalStartTime
         globalEndTime = datetime.timedelta(seconds=int(globalEndTime))
-        self.updateMessage.emit(ErrorStr.INFO + "Flowview done, {0} job(s) rendered in {1}, {2} error(s).".format(k, globalEndTime, errorFound), True, True)
+        
+        if errorFound:
+            msg = ErrorStr.WARNING
+        else:
+            msg = ErrorStr.INFO
+        
+        self.updateMessage.emit(msg + "Flowview done, {0} job(s) rendered in {1}, {2} error(s).".format(k, globalEndTime, errorFound), True, True)
         self.startJob.emit(True)
         self.progressBarToActivity.emit(False)
 
@@ -114,7 +120,7 @@ class CurrentJobWorkderThread(QtCore.QThread):
     updateProgressBar = QtCore.pyqtSignal(int)
     resetProgressBar = QtCore.pyqtSignal()
     progressBarToActivity = QtCore.pyqtSignal(bool)
-    updateMessage = QtCore.pyqtSignal(str, bool)
+    updateMessage = QtCore.pyqtSignal(str, bool, bool)
     startJob = QtCore.pyqtSignal(bool)
     
     def __init__(self):
@@ -146,7 +152,12 @@ class CurrentJobWorkderThread(QtCore.QThread):
             jobEndTime = datetime.timedelta(seconds=int(jobEndTime))
             
             self.progressBarToActivity.emit(False)
-            self.updateMessage.emit(ErrorStr.INFO + "Job: {0} rendered in {1}.".format(self.job.ID, jobEndTime), True, True)
+            
+            if self.job.ERROR:
+                self.updateMessage.emit(ErrorStr.ERROR + "Job: {0} failed: {1}".format(self.job.ID, self.job.ERROR), True, True)
+            else:
+                self.updateMessage.emit(ErrorStr.INFO + "Job: {0} rendered in {1}.".format(self.job.ID, jobEndTime), True, True)
+                
             self.startJob.emit(True)
             
 class TimerThread(QtCore.QThread):
