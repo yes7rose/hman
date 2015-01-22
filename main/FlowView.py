@@ -5,6 +5,8 @@ import pickle
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
+from IO_path import readInitPath
+
 from .JobWidget import JobWidget
 from .WorkerThread import JobWorkerThread
 from .WorkerThread import CurrentJobWorkderThread
@@ -372,6 +374,14 @@ class FlowView(QtGui.QWidget):
             pickle.dump(datas, f)
 
     def loadFlowview(self):
+        '''
+            Load a hman file (flowview)
+            It also check if software path are correct, if not found the job will be bypassed and a warning will be printed.
+        '''
+        
+        software_path = readInitPath(False)
+        path_warning = False
+        print software_path
         
         p = QtGui.QFileDialog.getOpenFileNames(parent=None, filter = "hman Files (*.hman)")
         
@@ -409,11 +419,26 @@ class FlowView(QtGui.QWidget):
                     if data["jobtype"] == JobTypes.MAYA:
                         w = MayaJobWidget(self.propertyDock, data["ID"] + (len(self.jobs)-data["ID"]), self, self.outputDock.output, self.UI_PROPERTIES, parent=self)
                         
+                        if not software_path["MAYA_PATH"]:
+                            self.outputDock.writeLog(ErrorStr.ErrorStr.ERROR + "Maya path not correct, job disabled.")
+                            w.bypassWidget()
+                            path_warning = True
+                        
                     elif data["jobtype"] == JobTypes.NUKE:
                         w = NukeJobWidget(self.propertyDock, data["ID"] + (len(self.jobs)-data["ID"]), self, self.outputDock.output, self.UI_PROPERTIES, parent=self)
                         
+                        if not software_path["NUKE_PATH"]:
+                            self.outputDock.writeLog(ErrorStr.ErrorStr.ERROR + "Nuke path not correct, job disabled.")
+                            w.bypassWidget()
+                            path_warning = True
+                        
                     elif data["jobtype"] == JobTypes.HOUDINI:
                         w = HoudiniJobWidget( self.propertyDock, data["ID"] + (len(self.jobs)-data["ID"]), self, self.outputDock.output, self.UI_PROPERTIES, parent=self)
+                        
+                        if not software_path["HOUDINI_PATH"]:
+                            self.outputDock.writeLog(ErrorStr.ErrorStr.ERROR + "Houdini path not correct, job disabled.")
+                            w.bypassWidget()
+                            path_warning = True
                         
                     elif data["jobtype"] == JobTypes.PYTHON:
                         w = PythonJobWidget( self.propertyDock, data["ID"] + (len(self.jobs)-data["ID"]), self, self.outputDock.output, parent=self)
@@ -426,8 +451,11 @@ class FlowView(QtGui.QWidget):
                         w.pathLabel.setText("Path: " + data["properties"]["file_path"])
                     self.addJob(w)
                 
-                 
-                LogW.writeLog(self.outputDock.output, ErrorStr.ErrorStr.INFO + " {0} loaded successfully.".format(str(f)))  
+                if path_warning:
+                    msg = ErrorStr.ErrorStr.WARNING + " {0} loaded with path warning(s). Some jobs are disabled.".format(str(f))
+                else:
+                    msg = ErrorStr.ErrorStr.INFO + " {0} loaded successfully.".format(str(f))
+                LogW.writeLog(self.outputDock.output, msg)  
             
     def mousePressEvent(self, event):
         '''
