@@ -23,6 +23,7 @@ import utils.LogW as LogW
 import utils.ErrorStr as ErrorStr
 
 DARK_STYLE = os.path.dirname(os.path.dirname(__file__)) + "\\dark.style"
+ICONS_PATH = os.path.dirname(__file__) + "\\icons\\"
 
 class FlowView(QtGui.QWidget):
     
@@ -31,6 +32,8 @@ class FlowView(QtGui.QWidget):
         
         self.setObjectName("flowview")
         self.graphDataValue = []
+        
+        self.FLOW_IS_RENDERING = False
         
         self.mainUI = parent
         self.UI_PROPERTIES = UI_PROPERTIES
@@ -56,14 +59,14 @@ class FlowView(QtGui.QWidget):
         self.workerThread.updateMessage.connect(self._ui_setInfoMessage)
         self.workerThread.resetProgressBar.connect(self._ui_resetProgressBar)
         self.workerThread.progressBarToActivity.connect(self._ui_progressBarToActivityMonitor)
-        self.workerThread.startJob.connect(self._ui_disableButton)
+        self.workerThread.startJob.connect(self._startJobSignal)
         self.workerThread.graphDataRefresh.connect(self.refreshGraphData)
         
         self.currentWorkerThread.updateProgressBar.connect(self._ui_updateProgressBar)
         self.currentWorkerThread.updateMessage.connect(self._ui_setInfoMessage)
         self.currentWorkerThread.resetProgressBar.connect(self._ui_resetProgressBar)
         self.currentWorkerThread.progressBarToActivity.connect(self._ui_progressBarToActivityMonitor)
-        self.currentWorkerThread.startJob.connect(self._ui_disableButton)
+        self.currentWorkerThread.startJob.connect(self._startJobSignal)
         
     def linkToPropertiesDock(self, propertyDock):
         '''
@@ -275,6 +278,15 @@ class FlowView(QtGui.QWidget):
         '''
             Render current job according to given ID
         '''
+        
+        if self.FLOW_IS_RENDERING:
+            msg = QtGui.QMessageBox(parent=self)
+            msg.setText("Rendering already in progress.")
+            msg.setWindowTitle("Error")
+            msg.setIcon(QtGui.QMessageBox.Critical)
+            msg.exec_()
+            return
+        
         self.currentWorkerThread.job = self.jobs[ID]
         self.currentWorkerThread.start()
         
@@ -283,6 +295,14 @@ class FlowView(QtGui.QWidget):
         '''
             Render the flowview
         '''
+        
+        if self.FLOW_IS_RENDERING:
+            msg = QtGui.QMessageBox(parent=self)
+            msg.setText("Rendering already in progress.")
+            msg.setWindowTitle("Error")
+            msg.setIcon(QtGui.QMessageBox.Critical)
+            msg.exec_()
+            return
         
         tmpJobs = self.jobs[0:ID+1]
         
@@ -336,6 +356,8 @@ class FlowView(QtGui.QWidget):
         
         if p == QtGui.QMessageBox.Ok:
             
+            self.FLOW_IS_RENDERING = False
+            
             self.currentWorkerThread.terminate()
             self.currentWorkerThread.wait()
             self.workerThread.terminate()
@@ -381,7 +403,6 @@ class FlowView(QtGui.QWidget):
         
         software_path = readInitPath(False)
         path_warning = False
-        print software_path
         
         p = QtGui.QFileDialog.getOpenFileNames(parent=None, filter = "hman Files (*.hman)")
         
@@ -468,20 +489,30 @@ class FlowView(QtGui.QWidget):
         for n in self.listJobs():
             n.unselectWidget()
             
+    # Start/stop flowview jobs signal
+    def _startJobSignal(self, toggle):
+        
+        self.FLOW_IS_RENDERING = toggle
+        self._ui_disableButton(not toggle)
+            
     # Update UI from thread
     def _ui_updateProgressBar(self, step):
+        
         self.mainUI._ui_updateProgressBar(step)
         
     def _ui_resetProgressBar(self):
+        
         self.mainUI._ui_resetProgressBar()
         
     def _ui_progressBarToActivityMonitor(self, enable=True):
         self.mainUI._ui_enableActivityMonitor(enable)
             
     def _ui_setInfoMessage(self, msg, toOutput=False, lastJob=False):
+        
         self.mainUI._ui_setInfoMessage(msg, toOutput, lastJob)
         
-    def _ui_disableButton(self, enable=False):
+    def _ui_disableButton(self, enable):
+        
         self.mainUI._ui_disableButton(enable)
         if enable:
             self.mainUI.cancelFlow.setEnabled(False)

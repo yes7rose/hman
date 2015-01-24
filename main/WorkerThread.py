@@ -38,7 +38,7 @@ class JobWorkerThread(QtCore.QThread):
             os.remove(TMP_GRAPHDATA)
         
         self.resetProgressBar.emit()
-        self.startJob.emit(False)
+        self.startJob.emit(True)
         
         globalStartTime = time.time()
         
@@ -65,6 +65,8 @@ class JobWorkerThread(QtCore.QThread):
             
             self.updateMessage.emit(ErrorStr.INFO + "Starting Job: {0} ({1})".format(i.ID, i.jobType), True, False)
             
+            i.switchRenderingMode(True)
+            
             jobStartTime = time.time()
             
             #Render job if it is a batch job, render in a separated thread
@@ -90,6 +92,8 @@ class JobWorkerThread(QtCore.QThread):
             else:
                 self.updateMessage.emit(ErrorStr.INFO + "Job: {0} finished in {1}".format(i.ID, jobEndTime), True, False)
             
+            i.switchRenderingMode(False)
+            
             self.updateProgressBar.emit(step)
             
             self.graphDataValues[0].append(k)
@@ -112,7 +116,7 @@ class JobWorkerThread(QtCore.QThread):
             msg = ErrorStr.INFO
         
         self.updateMessage.emit(msg + "Flowview done, {0} job(s) rendered in {1}, {2} error(s).".format(k, globalEndTime, errorFound), True, True)
-        self.startJob.emit(True)
+        self.startJob.emit(False)
         self.progressBarToActivity.emit(False)
 
 class CurrentJobWorkderThread(QtCore.QThread):
@@ -130,7 +134,7 @@ class CurrentJobWorkderThread(QtCore.QThread):
     def run(self):
         
         self.resetProgressBar.emit()
-        self.startJob.emit(False)
+        self.startJob.emit(True)
         
         jobStartTime = time.time()
         
@@ -158,7 +162,7 @@ class CurrentJobWorkderThread(QtCore.QThread):
             else:
                 self.updateMessage.emit(ErrorStr.INFO + "Job: {0} rendered in {1}.".format(self.job.ID, jobEndTime), True, True)
                 
-            self.startJob.emit(True)
+            self.startJob.emit(False)
             
 class TimerThread(QtCore.QThread):
     

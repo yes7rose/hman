@@ -77,7 +77,9 @@ class JobWidget(QtGui.QWidget):
         # set current color and outline
         self.BG_COLOR = Colors.DEFAULT_BG
         self.DEFAULT_BG_COLOR = Colors.DEFAULT_BG
-        self.OUTLINE_COLOR = Colors.DEFAULT_OUT
+        self.OUTLINE_COLOR_DEFAULT = Colors.DEFAULT_OUT
+        self.OUTLINE_COLOR_RENDERING = Colors.OUTLINE_RENDERING
+        self.OUTLINE_COLOR = self.OUTLINE_COLOR_DEFAULT
         self.OUTLINE_SIZE = 1.0
         
         # Default warning
@@ -214,13 +216,22 @@ class JobWidget(QtGui.QWidget):
         
         for n in self.flowView.listJobs():
             n.unselectWidget()
-        self.OUTLINE_COLOR = Colors.OUTLINE_SELECTED
+            
+        if not self.IS_RENDERING:
+            self.OUTLINE_COLOR = Colors.OUTLINE_SELECTED
+        else:
+            self.OUTLINE_COLOR = Colors.OUTLINE_SELECTED_RENDERING
+            
         self.repaint()
         self.setFocus()
         
     def unselectWidget(self):
         
-        self.OUTLINE_COLOR = Colors.DEFAULT_OUT
+        if not self.IS_RENDERING:
+            self.OUTLINE_COLOR = Colors.DEFAULT_OUT
+        else:
+            self.OUTLINE_COLOR = self.OUTLINE_COLOR_RENDERING
+
         self.repaint()
     
     def updatePathInfo(self, file_path):
@@ -296,8 +307,22 @@ class JobWidget(QtGui.QWidget):
         '''
             Launch the flowview rendering from this widget
         '''
-        self.flowView.renderFlow(self.ID)
         
+        self.flowView.renderFlow(self.ID)
+    
+    def switchRenderingMode(self, toggle):
+        
+        if toggle:
+            self.IS_RENDERING = True
+            self.OUTLINE_COLOR = self.OUTLINE_COLOR_RENDERING
+            self.OUTLINE_SIZE = 2.0
+        else:
+            self.IS_RENDERING = False
+            self.OUTLINE_COLOR = self.OUTLINE_COLOR_DEFAULT
+            self.OUTLINE_SIZE = 1.0
+            
+        self.update()
+    
     def renderCurrent(self):
         '''
             Render current widget node, launched from UI
@@ -784,6 +809,8 @@ class Colors():
     BYPASS_BG = QtGui.QColor(55,55,55)
     
     OUTLINE_SELECTED = QtGui.QColor(255,255,255)
+    OUTLINE_SELECTED_RENDERING = QtGui.QColor(120,230,120)
+    OUTLINE_RENDERING = QtGui.QColor(10,200,10)
     ERROR = (200,0,0)
     GREEN = (0,200,0)
     BLUE = (0,0,200)
